@@ -19,6 +19,8 @@ from django.http import JsonResponse
 from rest_framework.permissions import IsAuthenticated
 from django.http import JsonResponse
 from django.views import View
+
+
 # from datetime import datetime
 
 
@@ -36,7 +38,7 @@ class RegisterView(APIView):
         # print('userrrrrrr ... ', user.groups)
 
         if not is_user_exist:
-            new_user = Users(username=username, email=email, address=address,user_type = user_type,
+            new_user = Users(username=username, email=email, address=address, user_type=user_type,
                              email_activation_code=get_random_string(6), is_active=False)
             new_user.set_password(password)
             new_user.save()
@@ -180,8 +182,10 @@ class LoginView(APIView):
 from django.http import HttpResponse
 import os
 
+
 def check_env(request):
     return HttpResponse(f"<pre>DATABASE_URL = {os.environ.get('DATABASE_URL')}</pre>")
+
 
 class CustomerSellersView(APIView):
     def get(self, request):
@@ -218,21 +222,61 @@ class CustomerSellersView(APIView):
 
 class UserView(APIView):
     def get(self, request):
-        token = request.COOKIES.get('jwt')
-        # if not token:
-        #     raise AuthenticationFailed('Unauthenticated!')
+        token_str = request.COOKIES.get('jwt')
+
+        if not token_str:
+            # اگر توکن وجود نداشت، خطای احراز هویت صادر می‌کنیم
+            raise AuthenticationFailed('Unauthenticated! No token provided.')
+
         try:
-            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+            # توکن رشته‌ای را به بایت تبدیل می‌کنیم
+            token_bytes = token_str.encode('utf-8')
+
+            # حالا با توکن بایتی رمزگشایی را انجام می‌دهیم
+            payload = jwt.decode(token_bytes, 'secret', algorithms=['HS256'])
+
         except jwt.ExpiredSignatureError:
-            raise AuthenticationFailed('Unauthenticated!')
+            # اگر توکن منقضی شده باشد
+            raise AuthenticationFailed('Unauthenticated! Token has expired.')
+        except jwt.InvalidTokenError:
+            # برای سایر خطاهای مربوط به توکن (مثلاً توکن نامعتبر، امضای اشتباه و ...)
+            raise AuthenticationFailed('Unauthenticated! Invalid token.')
+        # می‌توانید خطاهای عمومی‌تر را هم در نظر بگیرید اگر لازم است
+        # except Exception as e:
+        #     print(f"An unexpected error occurred during token decode: {e}")
+        #     return Response({"detail": "An error occurred during authentication."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         user = Users.objects.filter(id=payload['id']).first()
+
+        if not user:
+            # این حالت نباید رخ دهد اگر توکن معتبر باشد و کاربر حذف نشده باشد
+            # اما بررسی آن خوب است
+            raise AuthenticationFailed('User associated with token not found.')
+
         print("user in api-user ----> ", user)
         print("user in payload ----> ", payload['id'])
 
-        # response_data = {'id': user.id, 'email': user.email, 'name': user.name}
         serializer = UserSerializer(user)
         return Response(serializer.data)
+
+
+# class UserView(APIView):
+#     def get(self, request):
+#         token = request.COOKIES.get('jwt')
+#         # if not token:
+#         #     raise AuthenticationFailed('Unauthenticated!')
+#         try:
+#             payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+#         except jwt.ExpiredSignatureError:
+#             raise AuthenticationFailed('Unauthenticated!')
+#
+#         user = Users.objects.filter(id=payload['id']).first()
+#         print("user in api-user ----> ", user)
+#         print("user in payload ----> ", payload['id'])
+#
+#         # response_data = {'id': user.id, 'email': user.email, 'name': user.name}
+#         serializer = UserSerializer(user)
+#         return Response(serializer.data)
 
 
 class SellerView(APIView):
@@ -430,6 +474,7 @@ class LatestGoldPriceView(APIView):
         except LatestGoldPrice.DoesNotExist:
             return Response({"error": "No price data found"}, status=status.HTTP_404_NOT_FOUND)
 
+
 # views.py
 class SellerStatusStoreView(APIView):
     def get(self, request, seller_id):
@@ -438,7 +483,6 @@ class SellerStatusStoreView(APIView):
             "store_name": seller.store_name,
             "is_open": seller.is_open
         })
-
 
 
 class TransactionSearchView(APIView):
