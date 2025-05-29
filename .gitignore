@@ -69,3 +69,13 @@ AngularUi/
 # Ignore pycache
 __pycache__/
 **/__pycache__/
+
+
+#users/
+#sellers/
+#todo/
+#requirements.txt/
+#utils/
+#zarino/
+#Procfile/
+#manage.py/
