@@ -114,9 +114,18 @@ class LoginView(APIView):
             'iat': datetime.datetime.utcnow()
         }
 
-        token = jwt.encode(payload, 'secret', algorithm='HS256', samesite=None, secure=True)
+        token = jwt.encode(payload, 'secret', algorithm='HS256')
         response = Response()
-        response.set_cookie(key='jwt', value=token, httponly=True, max_age=60000)
+        # response.set_cookie(key='jwt', value=token, httponly=True, max_age=60000)
+        response.set_cookie(
+            key='jwt',
+            value=token,
+            httponly=True,
+            max_age=60000,  # معادل 1000 دقیقه یا حدود ۱۶ ساعت
+            samesite='None',  # برای اجازه ارسال در درخواست‌های cross-origin
+            secure=True,  # برای اطمینان از ارسال فقط از طریق HTTPS
+            path='/'  # توصیه می‌شود برای اینکه کوکی برای تمام مسیرهای دامنه در دسترس باشد
+        )
 
         if user.user_type == 'customer':
             response.data = {
