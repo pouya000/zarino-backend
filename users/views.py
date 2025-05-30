@@ -236,17 +236,17 @@ class UserView(APIView):
         if not token_str:
             # اگر توکن وجود نداشت، خطای احراز هویت صادر می‌کنیم
             print(f"Original token type from cookie: {type(token_str)}")
-            print(f"Token value from cookie: {token_str}")
+            print(f"i am in UserView ---->  Token value from cookie: {token_str}")
             raise AuthenticationFailed('Unauthenticated! No token provided.')
 
         try:
             if isinstance(token_str, str):
                 token_bytes = token_str.encode('utf-8')
-                print(f"Encoded token type: {type(token_bytes)}")  # خط دیباگ
+                print(f"i am in UserView ----> Encoded token type: {type(token_bytes)}")  # خط دیباگ
             else:
                 # این حالت بعید است برای توکن از کوکی، اما برای اطمینان
                 token_bytes = token_str
-                print(f"Token was not a string, type: {type(token_bytes)}")  # خط دیباگ
+                print(f"i am in UserView ----> Token was not a string, type: {type(token_bytes)}")  # خط دیباگ
 
             payload = jwt.decode(token_bytes, 'secret', algorithms=['HS256'])
 

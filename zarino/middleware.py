@@ -30,7 +30,7 @@ class JWTAuthenticationMiddleware(MiddlewareMixin):
         print('i am in middlewRE ...')
         if not token_str:
             request.user = None
-            print("not token_str")
+            print("i am in middlewRE ----> not token_str")
             return
         try:
             token_bytes = token_str.encode('utf-8') # <<<<< این خط را فعال و اصلاح کنید
