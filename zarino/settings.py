@@ -26,7 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-7_7%p6!c7-d6j54am@qi7dos4^gglc2v)%70^m@#4-3yglj!b9'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 # Application definition
 
@@ -167,13 +167,13 @@ CSRF_TRUSTED_ORIGINS = [
     'http://localhost:8101',
     'http://127.0.0.1:8100',
     'http://127.0.0.1:8000'
+    "https://zarino.netlify.app",
 ]
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.1.11', 'zarino-backend.onrender.com',
-                 'zarino-backend-production.up.railway.app']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.1.11', 'zarino-backend.onrender.com',"zarino.netlify.app"]
 # ALLOWED_HOSTS = ['*']
 CORS_ALLOWED_ORIGINS = [
-    "https://puyazafrontend.netlify.app",
+    "https://zarino.netlify.app",
     "http://localhost:8100",
     "http://localhost:8101",
     "http://127.0.0.1:8100",
