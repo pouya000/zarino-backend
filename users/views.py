@@ -129,7 +129,6 @@ class LoginView(APIView):
 
         if user.user_type == 'customer':
             response.data = {
-                'jwt': token,
                 'user': {
                     'id': user.id,
                     'username': user.username,
@@ -141,7 +140,6 @@ class LoginView(APIView):
 
         if user.user_type == 'seller':
             response.data = {
-                'jwt': token,
                 'user': {
                     'id': user.id,
                     'username': user.username,
@@ -297,6 +295,7 @@ class UserView(APIView):
 class SellerView(APIView):
     def get(self, request):
         token = request.COOKIES.get('jwt')
+
         if not token:
             raise AuthenticationFailed('Unauthenticated!')
         try:
